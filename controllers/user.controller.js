@@ -27,6 +27,7 @@ const register =async(req, res)=>{
 
         const token = jwt.sign({
             email: newUser.email,
+            role_id: newUser.role_id
         },
             process.env.JWT_SECRET,
             {
@@ -67,6 +68,7 @@ const login =async(req, res)=>{
 
         const token = jwt.sign({
             email: user.email,
+            role_id: user.role_id
         },
             process.env.JWT_SECRET,
             {
@@ -96,9 +98,46 @@ const profile= async (req, res)=>{
     }
 }
 
+const findAll=async(req, res)=>{
+    try {
+        const users = await userModel.findAll()
+        
+        return res.json({ok : true, msg : users})
+    } catch (error) {
+        console.log(error)
+    }
+
+}
+
+const updateRoleVet =async (req, res)=>{
+
+    try {
+        const {uid}= req.params
+        const user= await userModel.findOneByUid(uid)
+
+        if (!user){
+            return res.status(400).json({error:"El usuario no existe"})
+        }
+
+        const updateUser = await userModel.updateRoleVet(uid)
+
+        return res.json({
+            ok:true,
+            msg:updateUser
+        })
+        
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ok:false, msg:'Error server'})
+    }
+
+}
+
 export const UserController={
     register,
     login,
-    profile
+    profile,
+    findAll,
+    updateRoleVet
 
 }

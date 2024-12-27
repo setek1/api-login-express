@@ -12,9 +12,10 @@ export const verifyToken=(req,res, next)=>{
    
 
     try {
-        const {email}=jwt.verify(token, process.env.JWT_SECRET)
+        const {email, role_id}=jwt.verify(token, process.env.JWT_SECRET)
         //el req en este caso actua como una inyeccion de datos al controlador.
         req.email= email
+        req.role_id= role_id
         next()
         
     } catch (error) {
@@ -23,4 +24,22 @@ export const verifyToken=(req,res, next)=>{
     }
 
     
+}
+
+export const verifyAdmin = (req, res, next)=>{
+
+    if(req.role_id ===1){
+        return next()
+    }
+
+    return res.status(403).json({error:"Unauthorized only admin user"})
+
+}
+
+export const verifyVet=(req, res, next)=>{
+    if(req.role_id ===2 || req.role_id ===1){
+        return next()
+    }
+    return res.status(403).json({error:"Unauthorized only vet user"})
+
 }
